@@ -209,7 +209,7 @@ def process_document(self: Task, job_id: str, document_id: str) -> dict:
         ).scalar_one_or_none()
 
         if not doc:
-            _update_job(session, job, status=JobStatus.FAILED, error_message="Document record not found")
+            _update_job(session, job, status=JobStatus.failed, error_message="Document record not found")
             _publish(jid, "job_failed", reason="Document not found")
             return {"error": "Document not found"}
 
@@ -217,7 +217,7 @@ def process_document(self: Task, job_id: str, document_id: str) -> dict:
             # ── Stage 1: Job started ──────────────────────────────────────
             _update_job(
                 session, job,
-                status=JobStatus.PROCESSING,
+                status=JobStatus.processing,
                 current_stage="job_started",
                 progress_pct=5,
                 started_at=datetime.now(timezone.utc),
@@ -279,7 +279,7 @@ def process_document(self: Task, job_id: str, document_id: str) -> dict:
 
             _update_job(
                 session, job,
-                status=JobStatus.COMPLETED,
+                status=JobStatus.completed,
                 current_stage="job_completed",
                 progress_pct=100,
                 completed_at=datetime.now(timezone.utc),
@@ -305,7 +305,7 @@ def process_document(self: Task, job_id: str, document_id: str) -> dict:
             logger.exception(f"Error processing job {jid}: {exc}")
             _update_job(
                 session, job,
-                status=JobStatus.FAILED,
+                status=JobStatus.failed,
                 current_stage="job_failed",
                 error_message=str(exc),
                 completed_at=datetime.now(timezone.utc),

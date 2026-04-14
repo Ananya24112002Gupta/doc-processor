@@ -92,10 +92,11 @@ async def create_document_with_job(
     )
     db.add(doc)
     await db.flush()  # get doc.id without committing
+    await db.refresh(doc)
 
     job = ProcessingJob(
         document_id=doc.id,
-        status=JobStatus.QUEUED,
+        status=JobStatus.queued,
         current_stage="queued",
         progress_pct=0,
     )
@@ -198,6 +199,7 @@ async def update_reviewed_output(
     doc.reviewed_output = reviewed
     doc.updated_at = datetime.now(timezone.utc)
     await db.flush()
+    await db.refresh(doc)
     return doc
 
 
@@ -212,7 +214,7 @@ async def finalize_document(db: AsyncSession, doc_id: str) -> Document:
         raise HTTPException(status_code=400, detail="Document is already finalized.")
 
     latest_job = _get_latest_job(doc)
-    if not latest_job or latest_job.status != JobStatus.COMPLETED:
+    if not latest_job or latest_job.status != JobStatus.completed:
         raise HTTPException(
             status_code=400,
             detail="Document must be fully processed before finalization.",
@@ -231,6 +233,7 @@ async def finalize_document(db: AsyncSession, doc_id: str) -> Document:
     doc.is_finalized = True
     doc.finalized_at = datetime.now(timezone.utc)
     await db.flush()
+    await db.refresh(doc)
     return doc
 
 
@@ -242,18 +245,19 @@ async def reset_job_for_retry(db: AsyncSession, doc_id: str) -> Tuple[Document, 
     doc = await get_document(db, doc_id)
     latest_job = _get_latest_job(doc)
 
-    if not latest_job or latest_job.status != JobStatus.FAILED:
+    if not latest_job or latest_job.status != JobStatus.failed:
         raise HTTPException(status_code=400, detail="Only failed jobs can be retried.")
 
     new_job = ProcessingJob(
         document_id=doc.id,
-        status=JobStatus.QUEUED,
+        status=JobStatus.queued,
         current_stage="queued",
         progress_pct=0,
         retry_count=latest_job.retry_count + 1,
     )
     db.add(new_job)
     await db.flush()
+    await db.refresh(doc)
     return doc, new_job
 
 

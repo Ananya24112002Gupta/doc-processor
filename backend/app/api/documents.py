@@ -165,7 +165,7 @@ async def stream_progress(doc_id: UUID, request: Request):
             job_id = str(latest_job.id)
 
             # If already done, emit a single event and close
-            if latest_job.status in (JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.FINALIZED):
+            if latest_job.status in (JobStatus.completed, JobStatus.failed, JobStatus.finalized):
                 yield _sse(
                     f"job_{latest_job.status.value}",
                     {

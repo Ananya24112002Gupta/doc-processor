@@ -12,11 +12,11 @@ from app.core.database import Base
 
 
 class JobStatus(str, enum.Enum):
-    QUEUED = "queued"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    FINALIZED = "finalized"
+    queued = "queued"
+    processing = "processing"
+    completed = "completed"
+    failed = "failed"
+    finalized = "finalized"
 
 
 class Document(Base):
@@ -55,7 +55,7 @@ class ProcessingJob(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     celery_task_id = Column(String(255), nullable=True)  # set after task is dispatched
-    status = Column(SAEnum(JobStatus), default=JobStatus.QUEUED, nullable=False)
+    status = Column(SAEnum(JobStatus), default=JobStatus.queued, nullable=False)
     current_stage = Column(String(100), nullable=True)   # human-readable stage name
     progress_pct = Column(Integer, default=0, nullable=False)  # 0–100
     error_message = Column(Text, nullable=True)

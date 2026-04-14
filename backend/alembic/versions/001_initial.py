@@ -16,8 +16,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Create jobstatus enum type
-    op.execute("CREATE TYPE jobstatus AS ENUM ('queued', 'processing', 'completed', 'failed', 'finalized')")
 
     op.create_table(
         "documents",
