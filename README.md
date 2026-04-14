@@ -30,7 +30,7 @@ The easiest way to run the entire system is via Docker Compose.
 
 3. **Access the Application**:
    * **Frontend UI**: [http://localhost:3000](http://localhost:3000)
-   * **Backend API Docs**: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+   * **Backend API Docs**: [http://localhost:8000/api/docs](http://localhost:8080/api/docs)
 
 *Note: The backend container runs Alembic migrations automatically on startup.*
 
